@@ -47,7 +47,7 @@ export class UserHomeComponent implements OnInit, OnDestroy {
   );
 
   showCollectorsNavButton = false;
-  showMyCustomersNavButton = true;
+  showMyCustomersNavButton = false;
 
   constructor(
     private authService: AuthService,
