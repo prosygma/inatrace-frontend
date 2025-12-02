@@ -5,8 +5,8 @@
 export const environment = {
     production: true,
     environmentName: window['env']['environmentName'] || '',
-    basePath: 'https://inatrace-frontend.test',
-    appBaseUrl: 'https://inatrace-frontend.test',
+    basePath: 'https://cocoageotrack.cm',
+    appBaseUrl: 'https://cocoageotrack.cm',
     qrCodeBasePath: window['env']['qrCodeBasePath'] || '',
     chainRelativeFileUploadUrl: '/api/common/document',
     chainRelativeFileDownloadUrl: '/api/common/document',
