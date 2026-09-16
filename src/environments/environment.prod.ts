@@ -29,7 +29,7 @@ export const environment = {
     harcodedLabelForPrivacyOnRegisterPage: '',
     beycoAuthURL: window['env']['beycoAuthURL'] || '',
     beycoClientId: window['env']['beycoClientId'] || '',
-    whispApiKey: '***REMOVED***'
+    whispApiKey: window['env']['whispApiKey'] || ''
 };
 
 /*

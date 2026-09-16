@@ -50,3 +50,6 @@ package-lock.json
 .DS_Store
 Thumbs.db
 
+# Server logs are not source and contain visitor IP addresses.
+/access.log
+*.log
