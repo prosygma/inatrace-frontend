@@ -126,19 +126,24 @@ export class CompanyDetailFacilityAddComponent implements OnInit, OnDestroy {
   }
 
   registerValidatorsOnUpdate() {
+    // Apply once for the current value too: an existing facility that is already public must
+    // require coordinates without the user having to toggle the field first
+    this.applyCoordinateValidators(this.fLoc.controls.publiclyVisible.value);
     this.fLoc.controls.publiclyVisible.valueChanges
         .pipe(takeUntil(this.destroy$))
-        .subscribe((val: string) => {
-          if (val === 'true') {
-            this.fLoc.controls.latitude.setValidators([Validators.required]);
-            this.fLoc.controls.longitude.setValidators([Validators.required]);
-          } else {
-            this.fLoc.controls.latitude.clearValidators();
-            this.fLoc.controls.longitude.clearValidators();
-          }
-          this.fLoc.controls.latitude.updateValueAndValidity();
-          this.fLoc.controls.longitude.updateValueAndValidity();
-        });
+        .subscribe((val: string) => this.applyCoordinateValidators(val));
+  }
+
+  private applyCoordinateValidators(publiclyVisible: string) {
+    if (publiclyVisible === 'true') {
+      this.fLoc.controls.latitude.setValidators([Validators.required]);
+      this.fLoc.controls.longitude.setValidators([Validators.required]);
+    } else {
+      this.fLoc.controls.latitude.clearValidators();
+      this.fLoc.controls.longitude.clearValidators();
+    }
+    this.fLoc.controls.latitude.updateValueAndValidity();
+    this.fLoc.controls.longitude.updateValueAndValidity();
   }
 
   initializeNew() {
@@ -193,6 +198,12 @@ export class CompanyDetailFacilityAddComponent implements OnInit, OnDestroy {
   save() {
     this.submitted = true;
     if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      this.globalEventsManager.push({
+        notificationType: 'error',
+        title: $localize`:@@facilityAdd.save.invalid.title:Facility not saved`,
+        message: $localize`:@@facilityAdd.save.invalid.message:Some required fields are missing or invalid. Please check the highlighted fields.`
+      });
       return;
     }
     const facility: ApiFacility = this.form.value;

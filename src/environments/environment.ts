@@ -16,7 +16,6 @@ export const environment = {
     relativeImageUploadUrlAllSizes: window['env']['relativeImageUploadUrlAllSizes'] || '',
     version: window['env']['version'] || '',
 
-    googleMapsApiKey: window['env']['googleMapsApiKey'] || '',
     googleAnalyticsId: window['env']['googleAnalyticsId'] || '',
     mapboxAccessToken: window['env']['mapboxAccessToken'] || '',
     facebookPixelId: window['env']['facebookPixelId'] || null,

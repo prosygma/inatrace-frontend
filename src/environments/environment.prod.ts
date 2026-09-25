@@ -16,7 +16,6 @@ export const environment = {
     relativeImageUploadUrlAllSizes: '/api/common/image',
     version: '2.40',
 
-    googleMapsApiKey: window['env']['googleMapsApiKey'] || '',
     googleAnalyticsId: '',
     mapboxAccessToken: window['env']['mapboxAccessToken'] || '',
     facebookPixelId: null,

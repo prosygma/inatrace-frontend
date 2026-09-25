@@ -1,11 +1,11 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { CompanyDetailTabManagerComponent } from '../company-detail-tab-manager/company-detail-tab-manager.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FacilityControllerService } from '../../../../api/api/facilityController.service';
 import { shareReplay, switchMap, take, tap } from 'rxjs/operators';
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { ApiFacilityLocation } from '../../../../api/model/apiFacilityLocation';
-import { GoogleMap, MapInfoWindow, MapMarker } from '@angular/google-maps';
+import { MapPin } from '../../../shared/mapbox-pins/mapbox-pins.component';
 import { GlobalEventManagerService } from '../../../core/global-event-manager.service';
 import { ApiPaginatedResponseApiFacility } from '../../../../api/model/apiPaginatedResponseApiFacility';
 import { ApiPaginatedListApiFacility } from '../../../../api/model/apiPaginatedListApiFacility';
@@ -32,17 +32,7 @@ export class CompanyDetailFacilitiesComponent extends CompanyDetailTabManagerCom
   pageSize = 10;
   page = 0;
 
-  gMap = null;
-  isGoogleMapsLoaded = false;
-  markers: any = [];
-  defaultCenter = {
-    lat: 5.274054,
-    lng: 21.514503
-  };
-  defaultZoom = 3;
-  bounds: any;
-  initialBounds: any = [];
-  gInfoWindowText = '';
+  markers: Array<MapPin> = [];
 
   public companyId;
   public facilities$: Observable<ApiPaginatedResponseApiFacility>;
@@ -55,12 +45,6 @@ export class CompanyDetailFacilitiesComponent extends CompanyDetailTabManagerCom
 
   @Output()
   countAll = new EventEmitter<number>();
-
-  @ViewChild(GoogleMap) set map(map: GoogleMap) {
-    if (map) { this.gMap = map; this.fitBounds(); }
-  }
-
-  @ViewChild(MapInfoWindow, { static: false }) gInfoWindow: MapInfoWindow;
 
   sortOptions: SortOption[] = [
     {
@@ -105,12 +89,6 @@ export class CompanyDetailFacilitiesComponent extends CompanyDetailTabManagerCom
     super.ngOnInit();
     this.companyId = this.route.snapshot.params.id;
     this.initializeFacilitiesObservable();
-
-    this.globalEventsManager.loadedGoogleMapsEmitter.subscribe(loaded => {
-      if (loaded) {
-        this.isGoogleMapsLoaded = true;
-      }
-    });
   }
 
   ngOnDestroy() {
@@ -150,36 +128,6 @@ export class CompanyDetailFacilitiesComponent extends CompanyDetailTabManagerCom
 
   onPageChange(event) {
     this.paging$.next(event);
-  }
-
-  openInfoWindow(gMarker: MapMarker, marker) {
-    this.gInfoWindowText = marker.infoText;
-    this.gInfoWindow.open(gMarker);
-  }
-
-  fitBounds() {
-    if (!this.gMap || this.gMap == null) { return; }
-    this.bounds = new google.maps.LatLngBounds();
-    for (const bound of this.initialBounds) {
-      this.bounds.extend(bound);
-    }
-    if (this.bounds.isEmpty()) {
-      this.gMap.googleMap.setCenter(this.defaultCenter);
-      this.gMap.googleMap.setZoom(this.defaultZoom);
-      return;
-    }
-    const center = this.bounds.getCenter();
-    const offset = 0.02;
-    const northEast = new google.maps.LatLng(
-        center.lat() + offset,
-        center.lng() + offset
-    );
-    const southWest = new google.maps.LatLng(
-        center.lat() - offset,
-        center.lng() - offset
-    );
-    const minBounds = new google.maps.LatLngBounds(southWest, northEast);
-    this.gMap.fitBounds(this.bounds.union(minBounds));
   }
 
   initializeFacilitiesObservable() {
@@ -229,21 +177,17 @@ export class CompanyDetailFacilitiesComponent extends CompanyDetailTabManagerCom
       return;
     }
     this.markers = [];
-    this.initialBounds = [];
     for (const item of data.items) {
       if (item.facilityLocation && item.facilityLocation.publiclyVisible && item.facilityLocation.latitude && item.facilityLocation.longitude) {
-        const tmp = {
+        this.markers.push({
           position: {
             lat: item.facilityLocation.latitude,
             lng: item.facilityLocation.longitude
           },
           infoText: item.name
-        };
-        this.markers.push(tmp);
-        this.initialBounds.push(tmp.position);
+        });
       }
     }
-    this.fitBounds();
   }
 
   async activateFacility(facilityId) {

@@ -72,7 +72,7 @@ This new major release includes new functionalities, refactorings, optimizations
    5. `relativeFileUploadUrlManualType`: `'/api/common/document'`
    6. `relativeImageUploadUrl`: `'/api/common/image'`
    7. `relativeImageUploadUrlAllSizes`: `'/api/common/image'`
-   8. `googleMapsApiKey`: have to obtain a key yourself
+   8. `mapboxAccessToken`: a Mapbox public (`pk.`) token — every map in the app uses Mapbox; restrict the token to your domains in the Mapbox account
 
 6. If using Beybo integration, add the following configuration keys in `environment.ts` (the values should be obtained from Beyco):
    1. `beycoAuthURL`: `url`
