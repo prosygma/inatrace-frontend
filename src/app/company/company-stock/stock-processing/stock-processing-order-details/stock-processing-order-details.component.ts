@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { GlobalEventManagerService } from '../../../../core/global-event-manager.service';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
@@ -126,7 +126,8 @@ export class StockProcessingOrderDetailsComponent implements OnInit, AfterViewIn
     private facilityController: FacilityControllerService,
     private authService: AuthService,
     private selUserCompanyService: SelectedUserCompanyService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private changeDetectorRef: ChangeDetectorRef
   ) { }
 
   get selectedProcAction(): ApiProcessingAction {
@@ -215,7 +216,7 @@ export class StockProcessingOrderDetailsComponent implements OnInit, AfterViewIn
     }
 
     return $localize`:@@productLabelStockProcessingOrderDetail.textinput.outputQuantity.expectedOutputHelpText:Expected output quantity range:` +
-        ` ${quantityFrom} ~ ${quantityTo} (${this.currentInputStockUnit.measurementUnitType.label})`;
+        ` ${quantityFrom} ~ ${quantityTo} (${this.currentInputStockUnit?.measurementUnitType?.label ?? ''})`;
   }
 
   get targetStockOrdersArray(): FormArray {
@@ -573,6 +574,13 @@ export class StockProcessingOrderDetailsComponent implements OnInit, AfterViewIn
   }
 
   private async loadFacilities() {
+
+    // The input component is rendered under *ngIf="selectedProcAction". When editing, nothing is
+    // awaited between setting the processing action and getting here, so Angular has not rendered it
+    // yet and this.input was undefined ("Cannot read properties of undefined (reading 'setInputFacility')").
+    if (!this.input) {
+      this.changeDetectorRef.detectChanges();
+    }
 
     if (this.editing) {
 

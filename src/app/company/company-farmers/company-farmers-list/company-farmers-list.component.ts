@@ -58,13 +58,13 @@ export class CompanyFarmersListComponent implements OnInit {
 
   sortOptions: SortOption[] = [
     {
-      key: 'name',
-      name: $localize`:@@productLabelStakeholdersCollectors.sortOptions.name.name:First name`,
+      key: 'surname',
+      name: $localize`:@@productLabelStakeholdersCollectors.sortOptions.surname.name:Last name`,
       defaultSortOrder: 'ASC'
     },
     {
-      key: 'surname',
-      name: $localize`:@@productLabelStakeholdersCollectors.sortOptions.surname.name:Last name`,
+      key: 'name',
+      name: $localize`:@@productLabelStakeholdersCollectors.sortOptions.name.name:First name`,
       defaultSortOrder: 'ASC'
     },
     {
@@ -95,13 +95,13 @@ export class CompanyFarmersListComponent implements OnInit {
 
   sortOptionsRwanda: SortOption[] = [
     {
-      key: 'name',
-      name: $localize`:@@productLabelStakeholdersCollectors.sortOptions.name.name:First name`,
+      key: 'surname',
+      name: $localize`:@@productLabelStakeholdersCollectors.sortOptions.surname.name:Last name`,
       defaultSortOrder: 'ASC'
     },
     {
-      key: 'surname',
-      name: $localize`:@@productLabelStakeholdersCollectors.sortOptions.surname.name:Last name`,
+      key: 'name',
+      name: $localize`:@@productLabelStakeholdersCollectors.sortOptions.name.name:First name`,
       defaultSortOrder: 'ASC'
     },
     {
@@ -132,13 +132,13 @@ export class CompanyFarmersListComponent implements OnInit {
 
   sortOptionsHonduras: SortOption[] = [
     {
-      key: 'name',
-      name: $localize`:@@productLabelStakeholdersCollectors.sortOptions.name.name:First name`,
+      key: 'surname',
+      name: $localize`:@@productLabelStakeholdersCollectors.sortOptions.surname.name:Last name`,
       defaultSortOrder: 'ASC'
     },
     {
-      key: 'surname',
-      name: $localize`:@@productLabelStakeholdersCollectors.sortOptions.surname.name:Last name`,
+      key: 'name',
+      name: $localize`:@@productLabelStakeholdersCollectors.sortOptions.name.name:First name`,
       defaultSortOrder: 'ASC'
     },
     {

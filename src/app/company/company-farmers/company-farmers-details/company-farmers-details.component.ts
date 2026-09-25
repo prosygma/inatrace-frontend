@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import _ from 'lodash-es';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -172,6 +172,7 @@ export class CompanyFarmersDetailsComponent implements OnInit, OnDestroy {
   constructor(
       private location: Location,
       private route: ActivatedRoute,
+      private router: Router,
       private companyService: CompanyControllerService,
       private globalEventsManager: GlobalEventManagerService,
       private selUserCompanyService: SelectedUserCompanyService,
@@ -568,6 +569,10 @@ export class CompanyFarmersDetailsComponent implements OnInit, OnDestroy {
       if (res && res.status === 'OK') {
         if (!stayOnPage) {
           this.dismiss();
+        } else if (!this.update && res.data?.id) {
+          // Saving a plot on a new farmer creates the farmer. Continue on its edit page, so the next
+          // save updates it instead of adding the same farmer again (with the saved plot ids).
+          await this.router.navigate(['..', 'edit', res.data.id], { relativeTo: this.route, replaceUrl: true });
         } else {
           this.plotsForm.updatePlots();
         }
