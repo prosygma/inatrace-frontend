@@ -37,6 +37,9 @@ import { SelectedUserCompanyService } from '../../../core/selected-user-company.
 import { FileSaverService } from "ngx-filesaver";
 import { HttpClient } from "@angular/common/http";
 import { PlotsFormComponent } from "../../company-common/plots-form/plots-form.component";
+import { AuthService } from '../../../core/auth.service';
+import { ApiUserGet } from '../../../../api/model/apiUserGet';
+import { farmerValidationStatusClass, farmerValidationStatusLabel } from '../../../shared-services/farmer-validation-status';
 
 @Component({
   selector: 'app-company-farmers-details',
@@ -54,6 +57,11 @@ export class CompanyFarmersDetailsComponent implements OnInit, OnDestroy {
   company: ApiCompany;
   companyId;
   farmer: ApiUserCustomer;
+
+  // Supervisor review: company admins and system admins may validate or reject a farmer
+  canReviewFarmer = false;
+  statusLabel = farmerValidationStatusLabel;
+  statusClass = farmerValidationStatusClass;
   farmerForm: FormGroup;
   submitted = false;
   qrCodeSize = 110;
@@ -173,6 +181,7 @@ export class CompanyFarmersDetailsComponent implements OnInit, OnDestroy {
       private location: Location,
       private route: ActivatedRoute,
       private router: Router,
+      private authService: AuthService,
       private companyService: CompanyControllerService,
       private globalEventsManager: GlobalEventManagerService,
       private selUserCompanyService: SelectedUserCompanyService,
@@ -242,6 +251,10 @@ export class CompanyFarmersDetailsComponent implements OnInit, OnDestroy {
     if (!this.company) { return; }
 
     this.companyId = this.company.id;
+
+    const profile = await this.authService.userProfile$.pipe(take(1)).toPromise();
+    this.canReviewFarmer = !!profile && (profile.role === ApiUserGet.RoleEnum.SYSTEMADMIN
+        || (profile.companyIdsAdmin || []).includes(this.companyId));
 
     switch (action) {
       case 'new':
@@ -576,6 +589,27 @@ export class CompanyFarmersDetailsComponent implements OnInit, OnDestroy {
         } else {
           this.plotsForm.updatePlots();
         }
+      }
+    } finally {
+      this.globalEventsManager.showLoading(false);
+    }
+  }
+
+  async setValidationStatus(status: 'VALIDATED' | 'REJECTED' | 'PENDING') {
+    if (!this.farmer?.id) {
+      return;
+    }
+    try {
+      this.globalEventsManager.showLoading(true);
+      const res = await this.companyService.setUserCustomerValidationStatus(this.farmer.id, status).pipe(take(1)).toPromise();
+      if (res && res.status === 'OK') {
+        this.farmer.validationStatus = res.data.validationStatus;
+        this.globalEventsManager.push({
+          action: 'success',
+          notificationType: 'success',
+          title: $localize`:@@farmerValidation.saved.title:Status updated`,
+          message: farmerValidationStatusLabel(res.data.validationStatus)
+        });
       }
     } finally {
       this.globalEventsManager.showLoading(false);

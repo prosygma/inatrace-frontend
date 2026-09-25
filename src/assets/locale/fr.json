@@ -3273,7 +3273,15 @@
 "valueChainDetail.textinput.productType.error": " Le type de produit est obligatoire. ",
 "valueChainDetail.textinput.productType.label": "Type de produit de la chaîne de valeur",
 "common.button.cancel": "Annuler",
-"common.button.close": "Fermer"
+"common.button.close": "Fermer",
+"farmerValidation.status.pending": "En attente de validation",
+"farmerValidation.status.rejected": "Non validé",
+"farmerValidation.status.validated": "Validé",
+"farmerValidation.column.status": "Statut",
+"farmerValidation.filter.all": "Tous les statuts",
+"farmerValidation.saved.title": "Statut mis à jour",
+"farmerValidation.action.validate": "Valider",
+"farmerValidation.action.reject": "Rejeter"
 }
 }
 	
