@@ -17,6 +17,7 @@ import {
 } from '../open-plot-details-externally-modal/open-plot-details-externally-modal.component';
 import { NgbModalImproved } from '../../../core/ngb-modal-improved/ngb-modal-improved.service';
 import { ApiCompany } from "../../../../api/model/apiCompany";
+import { farmerValidationStatusClass, farmerValidationStatusLabel } from '../../../shared-services/farmer-validation-status';
 
 @Component({
   selector: 'app-company-farmers-list',
@@ -43,6 +44,17 @@ export class CompanyFarmersListComponent implements OnInit {
   pagination$ = new BehaviorSubject(1);
   search$ = new BehaviorSubject('BY_NAME');
   ping$ = new BehaviorSubject(null);
+  // Supervisor review state filter; null = all farmers
+  validationStatus$ = new BehaviorSubject<'PENDING' | 'VALIDATED' | 'REJECTED'>(null);
+  validationStatusFilter = new FormControl(null);
+  validationStatusOptions = [
+    { value: null, label: $localize`:@@farmerValidation.filter.all:All statuses` },
+    { value: 'PENDING', label: farmerValidationStatusLabel('PENDING') },
+    { value: 'VALIDATED', label: farmerValidationStatusLabel('VALIDATED') },
+    { value: 'REJECTED', label: farmerValidationStatusLabel('REJECTED') }
+  ];
+  statusLabel = farmerValidationStatusLabel;
+  statusClass = farmerValidationStatusClass;
 
   showRwanda = false;
   showHonduras = false;
@@ -87,6 +99,11 @@ export class CompanyFarmersListComponent implements OnInit {
       inactive: true
     },
     {
+      key: 'validationStatus',
+      name: $localize`:@@farmerValidation.column.status:Status`,
+      inactive: true
+    },
+    {
       key: 'actions',
       name: $localize`:@@productLabelStakeholdersCollectors.sortOptions.actions.name:Actions`,
       inactive: true
@@ -121,6 +138,11 @@ export class CompanyFarmersListComponent implements OnInit {
     {
       key: 'cell',
       name: $localize`:@@productLabelStakeholdersCollectors.sortOptions.cell.name:Cell`,
+      inactive: true
+    },
+    {
+      key: 'validationStatus',
+      name: $localize`:@@farmerValidation.column.status:Status`,
       inactive: true
     },
     {
@@ -161,6 +183,11 @@ export class CompanyFarmersListComponent implements OnInit {
       inactive: true
     },
     {
+      key: 'validationStatus',
+      name: $localize`:@@farmerValidation.column.status:Status`,
+      inactive: true
+    },
+    {
       key: 'actions',
       name: $localize`:@@productLabelStakeholdersCollectors.sortOptions.actions.name:Actions`,
       inactive: true
@@ -180,6 +207,12 @@ export class CompanyFarmersListComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+
+    this.validationStatusFilter.valueChanges.subscribe(value => {
+      this.page = 1;
+      this.pagination$.next(1);
+      this.validationStatus$.next(value);
+    });
 
     this.authService.userProfile$.pipe(take(1)).subscribe(up => {
       this.isSystemOrRegionalAdmin = up && (up.role === RoleEnum.SYSTEMADMIN || up.role === RoleEnum.REGIONALADMIN);
@@ -208,9 +241,9 @@ export class CompanyFarmersListComponent implements OnInit {
 
   private async loadFarmers() {
 
-    this.farmers$ = combineLatest([this.sorting$, this.query$, this.search$, this.pagination$, this.ping$])
+    this.farmers$ = combineLatest([this.sorting$, this.query$, this.search$, this.pagination$, this.ping$, this.validationStatus$])
         .pipe(
-            map(([sort, queryString, search, page, ping]) => {
+            map(([sort, queryString, search, page, ping, validationStatus]) => {
               const params: GetUserCustomersForCompanyAndType.PartialParamMap = {
                 companyId: this.organizationId,
                 type: 'FARMER',
@@ -219,7 +252,8 @@ export class CompanyFarmersListComponent implements OnInit {
                 offset: (page - 1) * this.pageSize,
                 limit: this.pageSize,
                 query: queryString,
-                searchBy: search
+                searchBy: search,
+                validationStatus: validationStatus || undefined
               };
               return params;
             }),
