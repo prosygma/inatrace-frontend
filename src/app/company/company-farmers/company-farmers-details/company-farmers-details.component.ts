@@ -41,6 +41,7 @@ import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from '../../../core/auth.service';
 import { ApiUserGet } from '../../../../api/model/apiUserGet';
 import { farmerValidationStatusClass, farmerValidationStatusLabel } from '../../../shared-services/farmer-validation-status';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-company-farmers-details',
@@ -189,7 +190,8 @@ export class CompanyFarmersDetailsComponent implements OnInit, OnDestroy {
       public theme: ThemeService,
       private fileSaverService: FileSaverService,
       private httpClient: HttpClient,
-      private selfOnboardingService: SelfOnboardingService
+      private selfOnboardingService: SelfOnboardingService,
+      private toastService: ToastrService
   ) { }
 
   static ApiUserCustomerCooperativeCreateEmptyObject(): ApiUserCustomerCooperative {
@@ -580,6 +582,10 @@ export class CompanyFarmersDetailsComponent implements OnInit, OnDestroy {
     this.submitted = true;
 
     if (this.farmerForm.invalid) {
+      // The product types section sits at the bottom of a long form: say why nothing was saved.
+      if (this.farmerForm.get('productTypes')?.errors?.required) {
+        this.toastService.error($localize`:@@collectorDetail.list-editor.productTypes.error:Product types are required`);
+      }
       return;
     }
     if (this.checkNullEmpty(this.areaUnit) && this.checkAreaFieldsRequired()) {
