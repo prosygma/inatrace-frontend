@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import _ from 'lodash-es';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { ApiUserCustomer } from '../../../../api/model/apiUserCustomer';
@@ -32,11 +32,12 @@ import { CompanyProductTypesService } from '../../../shared-services/company-pro
 import { ApiProductType } from '../../../../api/model/apiProductType';
 import { ListNotEmptyValidator } from '../../../../shared/validation';
 import { ApiPayment } from '../../../../api/model/apiPayment';
-import {ApiFarmPlantInformation} from '../../../../api/model/apiFarmPlantInformation';
+import { ApiFarmPlantInformation } from '../../../../api/model/apiFarmPlantInformation';
 import { SelectedUserCompanyService } from '../../../core/selected-user-company.service';
-import { FileSaverService } from "ngx-filesaver";
-import { HttpClient } from "@angular/common/http";
-import { PlotsFormComponent } from "../../company-common/plots-form/plots-form.component";
+import { FileSaverService } from 'ngx-filesaver';
+import { HttpClient } from '@angular/common/http';
+import { SelfOnboardingService } from '../../../shared-services/self-onboarding.service';
+import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from '../../../core/auth.service';
 import { ApiUserGet } from '../../../../api/model/apiUserGet';
 import { farmerValidationStatusClass, farmerValidationStatusLabel } from '../../../shared-services/farmer-validation-status';
@@ -163,8 +164,8 @@ export class CompanyFarmersDetailsComponent implements OnInit, OnDestroy {
     }
   ];
 
-  @ViewChild('plotsForm', { static: false })
-  plotsForm: PlotsFormComponent;
+  @ViewChild('newFarmerTitleTooltip')
+  newFarmerTitleTooltip: NgbTooltip;
 
   public areaTranslations = {
     totalCultivatedLabel: $localize`:@@collectorDetail.textinput.totalCultivatedArea.label:Total cultivated area`,
@@ -187,7 +188,8 @@ export class CompanyFarmersDetailsComponent implements OnInit, OnDestroy {
       private selUserCompanyService: SelectedUserCompanyService,
       public theme: ThemeService,
       private fileSaverService: FileSaverService,
-      private httpClient: HttpClient
+      private httpClient: HttpClient,
+      private selfOnboardingService: SelfOnboardingService
   ) { }
 
   static ApiUserCustomerCooperativeCreateEmptyObject(): ApiUserCustomerCooperative {
@@ -223,6 +225,7 @@ export class CompanyFarmersDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.farmerForm = null;
     this.initData().then(() => {
       if (!this.update) {
         this.newFarmer();
@@ -240,6 +243,10 @@ export class CompanyFarmersDetailsComponent implements OnInit, OnDestroy {
       this.updateAreaUnitValidators();
       this.initValueChangeListeners();
     });
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 
   async initData() {
@@ -409,6 +416,7 @@ export class CompanyFarmersDetailsComponent implements OnInit, OnDestroy {
   }
 
   newFarmer() {
+
     this.farmerForm = generateFormFromMetadata(ApiUserCustomer.formMetadata(), this.emptyFarmer(), ApiUserCustomerValidationScheme);
 
     // in case of 1 product (auto selection), also add empty fields in form
@@ -420,6 +428,16 @@ export class CompanyFarmersDetailsComponent implements OnInit, OnDestroy {
         this.addNewFarmPlantInformation(this.productTypes[0]);
       });
     }
+
+    this.subscriptions.push(
+        this.selfOnboardingService.addFarmersCurrentStep$.subscribe(currentStep => {
+          if (currentStep === 3) {
+            setTimeout(() => this.newFarmerTitleTooltip.open());
+          } else {
+            setTimeout(() => this.newFarmerTitleTooltip.close());
+          }
+        })
+    );
   }
 
   editFarmer() {
@@ -575,19 +593,30 @@ export class CompanyFarmersDetailsComponent implements OnInit, OnDestroy {
       this.globalEventsManager.showLoading(true);
       let res;
       if (!this.update) {
+
         res = await this.companyService.addUserCustomer(this.companyId, data).toPromise();
+
       } else {
         res = await this.companyService.updateUserCustomer(data).toPromise();
       }
+
       if (res && res.status === 'OK') {
-        if (!stayOnPage) {
-          this.dismiss();
-        } else if (!this.update && res.data?.id) {
-          // Saving a plot on a new farmer creates the farmer. Continue on its edit page, so the next
-          // save updates it instead of adding the same farmer again (with the saved plot ids).
-          await this.router.navigate(['..', 'edit', res.data.id], { relativeTo: this.route, replaceUrl: true });
+
+        const currentAddFarmerStep = await this.selfOnboardingService.addFarmersCurrentStep$.pipe(take(1)).toPromise();
+        if (currentAddFarmerStep === 3) {
+          this.selfOnboardingService.setAddFarmersCurrentStep('success');
+          this.router.navigate(['/home']).then();
         } else {
-          this.plotsForm.updatePlots();
+
+          if (!stayOnPage) {
+            this.dismiss();
+          } else if (!this.update && res.data?.id) {
+            // Saving a plot on a new farmer creates the farmer. Continue on its edit page, so the next
+            // save updates it instead of adding the same farmer again (with the saved plot ids).
+            await this.router.navigate(['..', 'edit', res.data.id], { relativeTo: this.route, replaceUrl: true });
+          } else {
+            this.ngOnInit();
+          }
         }
       }
     } finally {
@@ -779,10 +808,6 @@ export class CompanyFarmersDetailsComponent implements OnInit, OnDestroy {
 
   onCountAllPayments(event) {
     this.allPaymentOrders = event;
-  }
-
-  ngOnDestroy() {
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 
 }

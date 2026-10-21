@@ -2,6 +2,8 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
+import { VERSION } from './version';
+
 export const environment = {
     production: true,
     environmentName: window['env']['environmentName'] || 'PROD',
@@ -10,11 +12,11 @@ export const environment = {
     qrCodeBasePath: window['env']['qrCodeBasePath'] || '',
     chainRelativeFileUploadUrl: '/api/common/document',
     chainRelativeFileDownloadUrl: '/api/common/document',
-    relativeFileUploadUrl: '/api/common/document',
-    relativeFileUploadUrlManualType: '/api/common/document',
-    relativeImageUploadUrl: '/api/common/image',
-    relativeImageUploadUrlAllSizes: '/api/common/image',
-    version: '2.40',
+    relativeFileUploadUrl: window['env']['relativeFileUploadUrl'] || '/api/common/document',
+    relativeFileUploadUrlManualType: window['env']['relativeFileUploadUrlManualType'] || '/api/common/document',
+    relativeImageUploadUrl: window['env']['relativeImageUploadUrl'] || '/api/common/image',
+    relativeImageUploadUrlAllSizes: window['env']['relativeImageUploadUrlAllSizes'] || '/api/common/image',
+    version: VERSION,
 
     googleAnalyticsId: '',
     mapboxAccessToken: window['env']['mapboxAccessToken'] || '',

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import {FormArray, FormControl, FormGroup} from '@angular/forms';
 import {ApiProductType} from '../../../../api/model/apiProductType';
 import {CompanyProductTypesService} from '../../../shared-services/company-product-types.service';
@@ -7,14 +7,13 @@ import {PlotCoordinatesManagerService} from '../../../shared-services/plot-coord
 import {ApiPlot} from '../../../../api/model/apiPlot';
 import {ListEditorManager} from '../../../shared/list-editor/list-editor-manager';
 import {defaultEmptyObject} from '../../../../shared/utils';
-// import {Subject} from 'rxjs/internal/Subject';
+import {Subject} from 'rxjs/internal/Subject';
 import {ApiPlotValidationScheme} from './validation';
 import {NgbModalImproved} from '../../../core/ngb-modal-improved/ngb-modal-improved.service';
 import {
   OpenPlotDetailsExternallyModalComponent
 } from '../../company-farmers/open-plot-details-externally-modal/open-plot-details-externally-modal.component';
 import { MapComponent } from '../../../shared/map/map.component';
-import {Subject} from 'rxjs';
 
 @Component({
   selector: 'app-plots-form',
@@ -60,9 +59,6 @@ export class PlotsFormComponent implements OnInit {
 
   @Output()
   deletePlot = new EventEmitter<void>();
-
-  @ViewChild('map', { static: false })
-  map: MapComponent;
 
   static ApiPlotCreateEmptyObject(): ApiPlot {
     const obj = ApiPlot.formMetadata();
@@ -117,12 +113,6 @@ export class PlotsFormComponent implements OnInit {
       PlotsFormComponent.ApiPlotEmptyObjectFormFactory(),
       ApiPlotValidationScheme
     );
-  }
-
-  public updatePlots(): void {
-
-    this.plots = this.form.get('plots').value;
-    this.map.updateMap(this.plots);
   }
 
   updateLonLat(coordinates: Array<ApiPlotCoordinate>) {

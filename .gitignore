@@ -43,12 +43,15 @@ speed-measure-plugin*.json
 npm-debug.log
 yarn-error.log
 testem.log
-package-lock.json
 /typings
 
 # System Files
 .DS_Store
 Thumbs.db
+
+
+# Python bytecode (release scripts)
+__pycache__/
 
 # Server logs are not source and contain visitor IP addresses.
 /access.log

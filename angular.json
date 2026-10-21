@@ -150,7 +150,7 @@
               "node_modules/mapbox-gl/dist/mapbox-gl.css",
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": ["src/assets/env.template.js"]
           }
         },
         "lint": {

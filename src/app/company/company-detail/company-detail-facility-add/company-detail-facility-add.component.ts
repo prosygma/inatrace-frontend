@@ -1,20 +1,19 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
-import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { defaultEmptyObject, generateFormFromMetadata } from '../../../../shared/utils';
 import { ApiFacility } from '../../../../api/model/apiFacility';
 import { ApiFacilityLocation } from '../../../../api/model/apiFacilityLocation';
 import { ApiFacilityValidationScheme } from './validation';
 import { FacilityControllerService } from '../../../../api/api/facilityController.service';
-import { first, take, takeUntil } from 'rxjs/operators';
+import { first, take } from 'rxjs/operators';
 import { ActiveFacilityTypeService } from '../../../shared-services/active-facility-types.service';
 import { ApiAddress } from '../../../../api/model/apiAddress';
 import { ApiCompanyBase } from '../../../../api/model/apiCompanyBase';
 import { EnumSifrant } from '../../../shared-services/enum-sifrant';
 import { ApiSemiProduct } from '../../../../api/model/apiSemiProduct';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-// import { Subject } from 'rxjs/internal/Subject';
 import { ApiFacilityTranslation } from '../../../../api/model/apiFacilityTranslation';
 import { FinalProductsForCompanyService } from '../../../shared-services/final-products-for-company.service';
 import { FinalProductControllerService } from '../../../../api/api/finalProductController.service';
@@ -36,8 +35,6 @@ import LanguageEnum = ApiFacilityTranslation.LanguageEnum;
   styleUrls: ['./company-detail-facility-add.component.scss']
 })
 export class CompanyDetailFacilityAddComponent implements OnInit, OnDestroy {
-
-  private destroy$ = new Subject<boolean>();
 
   public edit: boolean;
   public title: string;
@@ -125,33 +122,11 @@ export class CompanyDetailFacilityAddComponent implements OnInit, OnDestroy {
     });
   }
 
-  registerValidatorsOnUpdate() {
-    // Apply once for the current value too: an existing facility that is already public must
-    // require coordinates without the user having to toggle the field first
-    this.applyCoordinateValidators(this.fLoc.controls.publiclyVisible.value);
-    this.fLoc.controls.publiclyVisible.valueChanges
-        .pipe(takeUntil(this.destroy$))
-        .subscribe((val: string) => this.applyCoordinateValidators(val));
-  }
-
-  private applyCoordinateValidators(publiclyVisible: string) {
-    if (publiclyVisible === 'true') {
-      this.fLoc.controls.latitude.setValidators([Validators.required]);
-      this.fLoc.controls.longitude.setValidators([Validators.required]);
-    } else {
-      this.fLoc.controls.latitude.clearValidators();
-      this.fLoc.controls.longitude.clearValidators();
-    }
-    this.fLoc.controls.latitude.updateValueAndValidity();
-    this.fLoc.controls.longitude.updateValueAndValidity();
-  }
-
   initializeNew() {
     this.title = $localize `:@@productLabelStockFacilityModal.newFacility.newTitle:New facility`;
     this.form = generateFormFromMetadata(ApiFacility.formMetadata(), this.emptyObject(), ApiFacilityValidationScheme);
     (this.form as FormGroup).setControl('valueChains', this.selectedCompanyValueChainsControl);
     this.finalizeForm();
-    this.registerValidatorsOnUpdate();
     this.registerValueChainSubs();
   }
 
@@ -178,7 +153,6 @@ export class CompanyDetailFacilityAddComponent implements OnInit, OnDestroy {
       if (tmpCollection != null) { this.form.get('isCollectionFacility').setValue(tmpCollection.toString()); }
 
       this.finalizeForm();
-      this.registerValidatorsOnUpdate();
       this.registerValueChainSubs();
     });
   }
@@ -337,7 +311,6 @@ export class CompanyDetailFacilityAddComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.destroy$.next(true);
     if (this.valueChainSubs) {
       this.valueChainSubs.unsubscribe();
     }

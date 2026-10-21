@@ -122,11 +122,16 @@
 
     <div class="af-c6" style="padding-top: 25px;">
 
+        <div class="location-map-label" [class.location-map-label--required]="isMapPinRequired">
+            <span i18n="@@locationForm.mapPin.label">Map pin</span><span *ngIf="isMapPinRequired" aria-hidden="true">*</span>
+        </div>
+
         <app-mapbox-pins
                 height="250px"
                 addOn="dblclick"
                 [draggable]="true"
                 [markers]="markers"
+                [class.location-map--invalid]="submitted && hasInvalidMapPin"
                 (mapAdd)="placeMarker($event)"
                 (markerDragEnd)="placeMarker($event.position)"
                 (markerRemove)="removeMarker()">
@@ -151,11 +156,9 @@
                     i18n-label="@@locationForm.textinput.longitude.label">
             </textinput>
         </div>
-        <ng-container *ngIf="submitted && (form.get('facilityLocation.latitude')?.errors?.required || form.get('facilityLocation.longitude')?.errors?.required)">
-            <div class="sc-invalid-feedback" i18n="@@locationForm.coordinates.required">
-                A publicly visible location needs coordinates: double click on the map to drop a pin, or enter latitude and longitude.
-            </div>
-        </ng-container>
+        <div *ngIf="submitted && hasInvalidMapPin" class="sc-invalid-feedback" i18n="@@locationForm.mapPin.error">
+            A map pin is required when the location is publicly visible.
+        </div>
 
     </div>
 </div>
