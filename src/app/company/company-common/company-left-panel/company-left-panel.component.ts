@@ -82,9 +82,9 @@ export class CompanyLeftPanelComponent implements OnInit, OnDestroy {
                   this.selfOnboardingService.addProcessingActionCurrentStep$
                 ]).subscribe(([addFacilityStep, addProcActionStep]) => {
                   if (addFacilityStep === 2 || addProcActionStep === 2) {
-                    setTimeout(() => this.companyProfileButtonTooltip.open());
+                    setTimeout(() => this.companyProfileButtonTooltip?.open());
                   } else {
-                    setTimeout(() => this.companyProfileButtonTooltip.close());
+                    setTimeout(() => this.companyProfileButtonTooltip?.close());
                   }
                 })
             );

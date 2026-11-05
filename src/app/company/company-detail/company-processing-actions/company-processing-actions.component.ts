@@ -58,9 +58,9 @@ export class CompanyProcessingActionsComponent extends CompanyDetailTabManagerCo
 
     this.subscriptions = this.selfOnboardingService.addProcessingActionCurrentStep$.subscribe(step => {
       if (step === 3) {
-        this.addProcActionButtonTooltip.open();
+        this.addProcActionButtonTooltip?.open();
       } else {
-        this.addProcActionButtonTooltip.close();
+        this.addProcActionButtonTooltip?.close();
       }
     });
   }

@@ -112,7 +112,7 @@ export class CompanyDashboardComponent implements OnInit {
 
   // search fields form control
   deliveriesForm: FormGroup = this.fb.group({
-    from: this.fb.control(new Date(new Date().getFullYear() - 2, new Date().getMonth(), new Date().getDay(), 12)),
+    from: this.fb.control(new Date(new Date().getFullYear() - 2, new Date().getMonth(), new Date().getDate(), 12)),
     to: this.fb.control(new Date()),
     timeUnitGraphType: this.fb.control(undefined),
     facility: this.fb.control(null),
@@ -192,7 +192,7 @@ export class CompanyDashboardComponent implements OnInit {
   processingPerformanceMergeOptions: EChartsOption;
 
   processingPerformanceForm: FormGroup = this.fb.group({
-    from: this.fb.control(new Date(new Date().getFullYear() - 2, new Date().getMonth(), new Date().getDay(), 12)),
+    from: this.fb.control(new Date(new Date().getFullYear() - 2, new Date().getMonth(), new Date().getDate(), 12)),
     to: this.fb.control(new Date()),
     timeUnitGraphType: this.fb.control(undefined),
     facility: this.fb.control(null),

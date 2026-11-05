@@ -51,9 +51,9 @@ export class NewProductModalComponent implements OnInit, OnDestroy, AfterViewIni
 
     this.subs = this.selfOnboardingService.addProductCurrentStep$.subscribe(step => {
       if (step == 3) {
-        this.selectProductCompanyTooltip.open();
+        this.selectProductCompanyTooltip?.open();
       } else {
-        this.selectProductCompanyTooltip.close();
+        this.selectProductCompanyTooltip?.close();
       }
     });
   }

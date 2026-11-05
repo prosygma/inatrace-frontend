@@ -251,9 +251,9 @@ export class CompanyFarmersListComponent implements OnInit, OnDestroy, AfterView
 
     this.subs = this.selfOnboardingService.addFarmersCurrentStep$.subscribe(currentStep => {
       if (currentStep === 2) {
-        this.addFarmerButtonTooltip.open();
+        this.addFarmerButtonTooltip?.open();
       } else {
-        this.addFarmerButtonTooltip.close();
+        this.addFarmerButtonTooltip?.close();
       }
     });
   }

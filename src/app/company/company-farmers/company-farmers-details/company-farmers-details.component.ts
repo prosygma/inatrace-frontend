@@ -432,9 +432,9 @@ export class CompanyFarmersDetailsComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
         this.selfOnboardingService.addFarmersCurrentStep$.subscribe(currentStep => {
           if (currentStep === 3) {
-            setTimeout(() => this.newFarmerTitleTooltip.open());
+            setTimeout(() => this.newFarmerTitleTooltip?.open());
           } else {
-            setTimeout(() => this.newFarmerTitleTooltip.close());
+            setTimeout(() => this.newFarmerTitleTooltip?.close());
           }
         })
     );

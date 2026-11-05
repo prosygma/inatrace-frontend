@@ -222,7 +222,7 @@ export class StockUnitListComponent implements OnInit, OnDestroy, AfterViewInit 
           }, 50);
 
           if (step === 4) {
-            setTimeout(() => this.deliveriesListTooltip.open(), 50);
+            setTimeout(() => this.deliveriesListTooltip?.open(), 50);
           }
         })
     )

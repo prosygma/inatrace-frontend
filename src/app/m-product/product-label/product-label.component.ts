@@ -554,9 +554,9 @@ export class ProductLabelComponent extends ComponentCanDeactivate implements OnI
               this.unsubscribeList.add(
                   this.selfOnboardingService.addProductCurrentStep$.subscribe(step => {
                     if (step == 4) {
-                      this.createProductTooltip.open();
+                      this.createProductTooltip?.open();
                     } else {
-                      this.createProductTooltip.close();
+                      this.createProductTooltip?.close();
                     }
                   })
               );
