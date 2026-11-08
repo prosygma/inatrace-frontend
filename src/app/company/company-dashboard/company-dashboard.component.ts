@@ -371,6 +371,13 @@ export class CompanyDashboardComponent implements OnInit {
   }
 
   refreshProcessingPerformanceData() {
+    // No process selected (the company has none yet, or the filter was cleared): nothing to chart,
+    // and the API needs a processing action to normalise units.
+    if (!this.processingActionFormControl?.value?.id) {
+      this.procPerformanceGraphTrunked = false;
+      return;
+    }
+
 
     const efs: ApiProcessingPerformanceRequestEvidenceField[] = [];
 
@@ -637,6 +644,14 @@ export class CompanyDashboardComponent implements OnInit {
   }
 
   exportProcessingPerformance() {
+
+    // No process selected (the company has none yet, or the filter was cleared): nothing to chart,
+    // and the API needs a processing action to normalise units.
+    if (!this.processingActionFormControl?.value?.id) {
+      this.procPerformanceGraphTrunked = false;
+      return;
+    }
+
 
     const efs: ApiProcessingPerformanceRequestEvidenceField[] = [];
 

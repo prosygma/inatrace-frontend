@@ -234,7 +234,10 @@
                     </div>
 
                     <div>
-                      <div echarts [options]="processingPerformanceOption" [merge]="processingPerformanceMergeOptions"></div>
+                      <div *ngIf="!processingActionFormControl?.value?.id" class="mt-2 d-flex justify-content-center chart-info-message">
+                        <p><em i18n="@@companyDashboardComponent.graph.processingPerformance.noProcess">Select a process to see its performance. If the list is empty, define a processing action first.</em></p>
+                      </div>
+                      <div [hidden]="!processingActionFormControl?.value?.id" echarts [options]="processingPerformanceOption" [merge]="processingPerformanceMergeOptions"></div>
                       <div *ngIf="procPerformanceGraphTrunked" class="mt-2 d-flex justify-content-center chart-info-message">
                         <p><em i18n="@@companyDashboardComponent.graph.values.trunked">Only the first {{ maxShownOnProcPerformanceGraph }} values are shown.</em></p>
                       </div>
@@ -259,6 +262,7 @@
                     </div>
 
                     <button class="btn btn-solid round btn-table-new content-element--btn mb-3"
+                            [disabled]="!processingActionFormControl?.value?.id"
                             (click)="exportProcessingPerformance()">
                       <span i18n="@@companyDashboardComponent.button.export">Export Data</span>
                     </button>

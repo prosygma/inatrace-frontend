@@ -3159,6 +3159,7 @@
     "companyDashboardComponent.graph.labels.output": "Sortie",
     "companyDashboardComponent.graph.labels.ratioInPercent": "Ratio Entrée-Sortie en %",
     "companyDashboardComponent.graph.values.trunked": "Seules les premières {$INTERPOLATION} valeurs sont affichées.",
+    "companyDashboardComponent.graph.processingPerformance.noProcess": "Sélectionnez un processus pour voir sa performance. Si la liste est vide, définissez d'abord une action de transformation.",
     "plotsItem.header.text": "Coordonnées des parcelles",
     "plotsItem.action.showHidePlotArea": "Afficher/masquer la zone de parcelle",
     "plotsItem.action.undoLastPoint": "Annuler le dernier point",

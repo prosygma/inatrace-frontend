@@ -3169,6 +3169,7 @@
     "companyDashboardComponent.graph.labels.output": "Output",
     "companyDashboardComponent.graph.labels.ratioInPercent": "Input-Output ratio in %",
     "companyDashboardComponent.graph.values.trunked": "Only the first {$INTERPOLATION} values are shown.",
+    "companyDashboardComponent.graph.processingPerformance.noProcess": "Select a process to see its performance. If the list is empty, define a processing action first.",
     "plotsItem.header.text": "Plot coordinates",
     "plotsItem.action.showHidePlotArea": "Show/hide plot area",
     "plotsItem.action.undoLastPoint": "Undo last point",
