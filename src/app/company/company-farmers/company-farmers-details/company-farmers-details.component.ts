@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AbstractControl, FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormControl, FormGroup } from '@angular/forms';
 import _ from 'lodash-es';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { ApiUserCustomer } from '../../../../api/model/apiUserCustomer';
@@ -15,7 +15,7 @@ import { ApiBankInformation } from '../../../../api/model/apiBankInformation';
 import { ApiFarmInformation } from '../../../../api/model/apiFarmInformation';
 import { ApiLocation } from '../../../../api/model/apiLocation';
 import { ApiAddress } from '../../../../api/model/apiAddress';
-import { debounceTime, first, startWith, take } from 'rxjs/operators';
+import { first, take } from 'rxjs/operators';
 import { EnumSifrant } from '../../../shared-services/enum-sifrant';
 import { ThemeService } from '../../../shared-services/theme.service';
 import { environment } from '../../../../environments/environment';
@@ -41,6 +41,7 @@ import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from '../../../core/auth.service';
 import { ApiUserGet } from '../../../../api/model/apiUserGet';
 import { farmerValidationStatusClass, farmerValidationStatusLabel } from '../../../shared-services/farmer-validation-status';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-company-farmers-details',
@@ -80,9 +81,7 @@ export class CompanyFarmersDetailsComponent implements OnInit, OnDestroy {
 
   genderCodebook = EnumSifrant.fromObject({
     MALE: $localize`:@@collectorDetail.gender.male:Male`,
-    FEMALE: $localize`:@@collectorDetail.gender.female:Female`,
-    N_A: 'N/A',
-    DIVERSE: $localize`:@@collectorDetail.gender.diverse:Diverse`
+    FEMALE: $localize`:@@collectorDetail.gender.female:Female`
   });
 
   readonly farmerType = UserCustomerTypeEnum.FARMER;
@@ -189,7 +188,8 @@ export class CompanyFarmersDetailsComponent implements OnInit, OnDestroy {
       public theme: ThemeService,
       private fileSaverService: FileSaverService,
       private httpClient: HttpClient,
-      private selfOnboardingService: SelfOnboardingService
+      private selfOnboardingService: SelfOnboardingService,
+      private toastService: ToastrService
   ) { }
 
   static ApiUserCustomerCooperativeCreateEmptyObject(): ApiUserCustomerCooperative {
@@ -240,8 +240,6 @@ export class CompanyFarmersDetailsComponent implements OnInit, OnDestroy {
       this.productTypesCodebook = new CompanyProductTypesService(this.companyService, this.companyId);
 
       this.initializeListManager();
-      this.updateAreaUnitValidators();
-      this.initValueChangeListeners();
     });
   }
 
@@ -310,8 +308,6 @@ export class CompanyFarmersDetailsComponent implements OnInit, OnDestroy {
         numberOfPlants: new FormControl(farmPlantInformation.numberOfPlants)
       });
 
-      this.addControlValueChangeListener(formGroup.get('plantCultivatedArea') as FormControl);
-
       newListControls.push(formGroup);
     });
 
@@ -327,8 +323,6 @@ export class CompanyFarmersDetailsComponent implements OnInit, OnDestroy {
           plantCultivatedArea: new FormControl(null),
           numberOfPlants: new FormControl(null)
         });
-
-        this.addControlValueChangeListener(formGroup.get('plantCultivatedArea') as FormControl);
 
         newListControls.push(formGroup);
       }
@@ -349,8 +343,6 @@ export class CompanyFarmersDetailsComponent implements OnInit, OnDestroy {
       numberOfPlants: new FormControl(null)
     });
 
-    this.addControlValueChangeListener(formGroup.get('plantCultivatedArea') as FormControl);
-
     (this.farmerForm.get('farm.farmPlantInformationList') as FormArray).push(formGroup);
   }
 
@@ -364,56 +356,6 @@ export class CompanyFarmersDetailsComponent implements OnInit, OnDestroy {
     resultArrayControls.forEach(res => plantInfoListArray.push(res));
   }
 
-  initValueChangeListeners() {
-
-    if (this.areaUnit != null) {
-      this.subscriptions.push(this.areaUnit.valueChanges.pipe(
-          startWith(null),
-          debounceTime(100)).subscribe(
-          val => {
-            if (val !== null && val !== undefined) {
-              this.updateAreaUnitValidators();
-            }
-          }
-      ));
-    }
-
-    if (this.totalCultivatedArea != null) {
-      this.subscriptions.push(this.totalCultivatedArea.valueChanges.pipe(
-          startWith(null),
-          debounceTime(100)).subscribe(
-          val => {
-            if (val !== null && val !== undefined) {
-              this.updateAreaUnitValidators();
-            }
-          }
-      ));
-    }
-
-    if (this.areaOrganicCertified != null) {
-      this.subscriptions.push(this.areaOrganicCertified.valueChanges.pipe(
-          startWith(null),
-          debounceTime(100)).subscribe(
-          val => {
-            if (val !== null && val !== undefined) {
-              this.updateAreaUnitValidators();
-            }
-          }
-      ));
-    }
-  }
-
-  private addControlValueChangeListener(control: FormControl) {
-    this.subscriptions.push(control.valueChanges.pipe(
-      startWith(null),
-      debounceTime(100)).subscribe(
-      val => {
-        if (val !== null && val !== undefined) {
-          this.updateAreaUnitValidators();
-        }
-      }
-    ));
-  }
 
   newFarmer() {
 
@@ -580,10 +522,10 @@ export class CompanyFarmersDetailsComponent implements OnInit, OnDestroy {
     this.submitted = true;
 
     if (this.farmerForm.invalid) {
-      return;
-    }
-    if (this.checkNullEmpty(this.areaUnit) && this.checkAreaFieldsRequired()) {
-      this.updateAreaUnitValidators();
+      // The product types section sits at the bottom of a long form: say why nothing was saved.
+      if (this.farmerForm.get('productTypes')?.errors?.required) {
+        this.toastService.error($localize`:@@collectorDetail.list-editor.productTypes.error:Product types are required`);
+      }
       return;
     }
 
@@ -710,53 +652,10 @@ export class CompanyFarmersDetailsComponent implements OnInit, OnDestroy {
     this.farmerForm.value.associations.splice(index, 1);
   }
 
-  updateAreaUnitValidators() {
-    if (this.areaUnit == null) {
-      return;
-    }
-    this.areaUnit.clearValidators();
-    this.areaUnit.setValidators(
-      this.checkAreaFieldsRequired() ?
-        [Validators.required] : []
-    );
-    this.farmerForm.markAllAsTouched();
-    this.farmerForm.updateValueAndValidity();
-  }
-
-  get checkAreaFieldInvalid() {
-    return this.checkNullEmpty(this.areaUnit) && this.checkAreaFieldsRequired();
-  }
-
-  checkAreaFieldsRequired() {
-    return (!this.checkNullEmpty(this.totalCultivatedArea) ||
-      this.checkPlantsCultivatedAreaFields() ||
-      !this.checkNullEmpty(this.areaOrganicCertified));
-  }
-
-  checkNullEmpty(control: FormControl){
-    return control == null || control.value == null || control.value === '';
-  }
-
-  checkPlantsCultivatedAreaFields() {
-    const farmPlantInformationList = this.farmerForm.get('farm.farmPlantInformationList') as FormArray;
-    if (farmPlantInformationList != null) {
-      const controls = farmPlantInformationList.controls;
-      return controls.some(control => !this.checkNullEmpty(control.get('plantCultivatedArea') as FormControl));
-    }
-  }
-
   public get areaUnit(): FormControl {
     return this.farmerForm.get('farm.areaUnit') as FormControl;
   }
 
-  public get totalCultivatedArea(): FormControl {
-    return this.farmerForm.get('farm.totalCultivatedArea') as FormControl;
-  }
-
-  public get areaOrganicCertified(): FormControl {
-    return this.farmerForm.get('farm.areaOrganicCertified') as FormControl;
-  }
-  
   appendAreaUnit(message: string, unit: string): string {
     if (unit && unit.length > 0) {
       return message + ` (${unit})`;

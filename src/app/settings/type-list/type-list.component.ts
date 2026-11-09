@@ -376,6 +376,14 @@ export class TypeListComponent implements OnInit, OnChanges {
           this.reloadPage();
         }
       }
+      // A product type still used by a value chain, farmer or plot is refused by the backend; the
+      // token interceptor shows its message as an error toast and the list stays as it is.
+      if (this.type === 'product-types') {
+        const res = await this.productTypesService.deleteProductType(type.id).pipe(take(1)).toPromise();
+        if (res && res.status === 'OK') {
+          this.reloadPage();
+        }
+      }
     } catch (e) {
     } finally {
       this.globalEventsManager.showLoading(false);

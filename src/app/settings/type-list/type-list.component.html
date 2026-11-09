@@ -108,6 +108,13 @@
                    [class.enabled-action]="true">
                   <span *ngIf="isRegionalAdmin; else editMode" i18n="@@settingsTypes.tableCol.view">View</span>
                 </a>
+                <a i18n="@@settingsTypes.tableCol.delete"
+                   (click)="delete(type)"
+                   class="company-action"
+                   [class.enabled-action]="!isRegionalAdmin"
+                   [class.disabled-action]="isRegionalAdmin">
+                  Delete
+                </a>
               </span>
             </td>
           </tr>

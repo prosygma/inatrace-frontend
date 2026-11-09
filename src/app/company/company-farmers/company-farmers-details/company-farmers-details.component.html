@@ -320,15 +320,7 @@
                             i18n-label="@@collectorDetail.textinput.areaUnit.label"
                             style="width: 100%"
                             placeholder="Enter area unit"
-                            i18n-placeholder="@@collectorDetail.textinput.areaUnit.placeholder"
-                            [isInvalid]="checkAreaFieldInvalid">
-                            <ng-container>
-                                <div *ngIf="checkAreaFieldInvalid" class="sc-invalid-feedback">
-                                    <div i18n="@@collectorDetail.textinput.areaUnit.error">
-                                        Area unit is required
-                                    </div>
-                                </div>
-                            </ng-container>
+                            i18n-placeholder="@@collectorDetail.textinput.areaUnit.placeholder">
                         </textinput>
 
                         <textinput
@@ -420,24 +412,21 @@
                         </list-editor>
                     </div>
 
-                    <h2 i18n="@@collectorDetail.section.productTypes">Product types</h2>
+                    <h2><span i18n="@@collectorDetail.section.productTypes">Product types</span>*</h2>
                     <div class="af-form-element">
                         <div class="search-field" *ngIf="company?.valueChains?.length > 0">
                             <single-choice
                               [formControlInput]="productTypesForm"
                               [codebookService]="productTypesCodebook"
                               (onChange)="addSelectedProductType($event)">
-                                <ng-container *ngIf="submitted">
-                                    <div *ngIf="farmerForm.get('productTypes').errors as errors" class="sc-invalid-feedback">
-                                        <div *ngIf="errors.required" i18n="@@collectorDetail.list-editor.productTypes.error">
-                                            <span>Product types are required</span>
-                                        </div>
-                                    </div>
-                                </ng-container>
                             </single-choice>
                         </div>
                         <div *ngIf="!company?.valueChains || company.valueChains.length === 0">
                             <small><em i18n="@@collectorDetail.list-editor.hint.selectValueChain">Please select at least one value chain</em></small>
+                        </div>
+                        <!-- Outside the picker, which is hidden when the company has no value chain. -->
+                        <div *ngIf="submitted && farmerForm.get('productTypes').errors?.required" class="sc-invalid-feedback d-block">
+                            <span i18n="@@collectorDetail.list-editor.productTypes.error">Product types are required</span>
                         </div>
                         <div *ngFor="let productType of this.productTypes; index as idx">
                             <div class="d-flex justify-content-between pl-3 pr-3 mb-1">
