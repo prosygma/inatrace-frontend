@@ -110,9 +110,9 @@ export class CompanyDetailFacilitiesComponent extends CompanyDetailTabManagerCom
 
     this.subscriptions = this.selfOnboardingService.addFacilityCurrentStep$.subscribe(step => {
       if (step === 3) {
-        this.addFacilityButtonTooltip.open();
+        this.addFacilityButtonTooltip?.open();
       } else {
-        this.addFacilityButtonTooltip.close();
+        this.addFacilityButtonTooltip?.close();
       }
     });
   }

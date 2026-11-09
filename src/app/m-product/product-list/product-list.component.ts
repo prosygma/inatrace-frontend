@@ -127,9 +127,9 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subs.add(
         this.selfOnboardingService.addProductCurrentStep$.subscribe(step => {
           if (step === 2) {
-            this.newProductButtonTooltip.open();
+            this.newProductButtonTooltip?.open();
           } else {
-            this.newProductButtonTooltip.close();
+            this.newProductButtonTooltip?.close();
           }
         })
     );

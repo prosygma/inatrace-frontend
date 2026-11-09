@@ -112,7 +112,7 @@ export class CompanyDashboardComponent implements OnInit {
 
   // search fields form control
   deliveriesForm: FormGroup = this.fb.group({
-    from: this.fb.control(new Date(new Date().getFullYear() - 2, new Date().getMonth(), new Date().getDay(), 12)),
+    from: this.fb.control(new Date(new Date().getFullYear() - 2, new Date().getMonth(), new Date().getDate(), 12)),
     to: this.fb.control(new Date()),
     timeUnitGraphType: this.fb.control(undefined),
     facility: this.fb.control(null),
@@ -192,7 +192,7 @@ export class CompanyDashboardComponent implements OnInit {
   processingPerformanceMergeOptions: EChartsOption;
 
   processingPerformanceForm: FormGroup = this.fb.group({
-    from: this.fb.control(new Date(new Date().getFullYear() - 2, new Date().getMonth(), new Date().getDay(), 12)),
+    from: this.fb.control(new Date(new Date().getFullYear() - 2, new Date().getMonth(), new Date().getDate(), 12)),
     to: this.fb.control(new Date()),
     timeUnitGraphType: this.fb.control(undefined),
     facility: this.fb.control(null),
@@ -371,6 +371,13 @@ export class CompanyDashboardComponent implements OnInit {
   }
 
   refreshProcessingPerformanceData() {
+    // No process selected (the company has none yet, or the filter was cleared): nothing to chart,
+    // and the API needs a processing action to normalise units.
+    if (!this.processingActionFormControl?.value?.id) {
+      this.procPerformanceGraphTrunked = false;
+      return;
+    }
+
 
     const efs: ApiProcessingPerformanceRequestEvidenceField[] = [];
 
@@ -637,6 +644,14 @@ export class CompanyDashboardComponent implements OnInit {
   }
 
   exportProcessingPerformance() {
+
+    // No process selected (the company has none yet, or the filter was cleared): nothing to chart,
+    // and the API needs a processing action to normalise units.
+    if (!this.processingActionFormControl?.value?.id) {
+      this.procPerformanceGraphTrunked = false;
+      return;
+    }
+
 
     const efs: ApiProcessingPerformanceRequestEvidenceField[] = [];
 

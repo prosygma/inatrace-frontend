@@ -190,9 +190,9 @@ export class UserHomeComponent implements OnInit, OnDestroy, AfterViewInit {
     this.sub.add(
       this.selfOnboardingService.addFarmersCurrentStep$.subscribe(currentStep => {
         if (currentStep === 1) {
-          this.farmersNavButtonTooltip.open();
+          this.farmersNavButtonTooltip?.open();
         } else {
-          this.farmersNavButtonTooltip.close();
+          this.farmersNavButtonTooltip?.close();
         }
       })
     );
@@ -200,9 +200,9 @@ export class UserHomeComponent implements OnInit, OnDestroy, AfterViewInit {
     this.sub.add(
         this.selfOnboardingService.guidedTourStep$.subscribe(step => {
           if (step === 1) {
-            this.myStockNavButtonTooltip.open();
+            this.myStockNavButtonTooltip?.open();
           } else {
-            this.myStockNavButtonTooltip.close();
+            this.myStockNavButtonTooltip?.close();
           }
         })
     );

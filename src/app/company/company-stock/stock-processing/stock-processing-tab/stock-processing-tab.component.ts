@@ -55,14 +55,14 @@ export class StockProcessingTabComponent extends StockCoreTabComponent implement
     this.subs = this.selfOnboardingService.guidedTourStep$.subscribe(step => {
 
       setTimeout(() => {
-        this.procActionsTitleTooltip.close();
-        this.facilityListTooltip.close();
+        this.procActionsTitleTooltip?.close();
+        this.facilityListTooltip?.close();
       }, 50)
 
       if (step === 5) {
-        setTimeout(() => this.procActionsTitleTooltip.open(), 50);
+        setTimeout(() => this.procActionsTitleTooltip?.open(), 50);
       } else if (step === 6) {
-        setTimeout(() => this.facilityListTooltip.open(), 50);
+        setTimeout(() => this.facilityListTooltip?.open(), 50);
       }
     });
   }
